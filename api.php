@@ -39,7 +39,7 @@
 		$sensor_name = $sensor->sensor_type;
 		$quantity_name = $sensor->measured_phenomenon;
 		$quantity_unit = $sensor->unit_of_measurement;
-		$context_description = $sensor->measurement_context;
+		$context_description = $sensor->context;
 		$newSensor = false;
 		$newQuantity = false;
 		$newUnit = false;
