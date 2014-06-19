@@ -32,8 +32,7 @@
 		or die('Could not connect: ' . pg_last_error());
 	
 	$newNode = false;
-	$i = 1;
-	$j = 1;
+	$measurementCounter = 0;
 	foreach ($sensors as $sensor) {
 		$node_name = $sensor->sensor_node_id;
 		$sensor_name = $sensor->sensor_type;
@@ -183,11 +182,10 @@
 			
 			$measurementsIdQuery .= "($nodeId,$sensorId,$quantityId,";	
 			$measurementsIdQuery .= "$locationId,$contextId,'$ts',$value,$unitId),";		
-			$j++;			
+			$measurementCounter++;			
 		}
 		$measurementsIdQuery = substr_replace($measurementsIdQuery, ";", -1);		
 		$measurementId = dbQueryReturnId($dbconn, $measurementsIdQuery);
-		$i++;
 	}
-	echo ($j . ' measurements successfully uploaded!');
+	echo ($measurementCounter . ' measurements successfully uploaded!');
 ?>
