@@ -44,7 +44,9 @@ if (!empty($sn_id) && strlen($sn_id) <= 5) {
 	$query .= "measurements.unit_id = units.unit_id AND ";
 	$query .= "measurements.context_id = contexts.context_id AND ";
 	$query .= "measurements.location_id = locations.location_id AND ";
-	$query .= "nodes.node_name = '$sn_id' LIMIT $limit";
+	$query .= "nodes.node_name = '$sn_id' ";
+	$query .= "ORDER BY measurements.measurement_id DESC ";
+	$query .= "LIMIT $limit;";
 	
 	$result = pg_query($dbconn, $query);	
 	if (!$result) {
