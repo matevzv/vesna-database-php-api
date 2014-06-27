@@ -4,14 +4,13 @@
 	<script type="text/javascript">
 	function requestCsvFile() {
 		var nodeName = document.getElementById('nodename').value;
-		limit = document.getElementById('limit').value;
+		var limit = document.getElementById('limit').value;
 		var visitortime = new Date();
 		var visitortimezone = -visitortime.getTimezoneOffset()/60;
 		window.open("measurements.php?id="+nodeName+"&limit="+limit+"&tz="+visitortimezone, "frame");
 	};
 	</script>
 </head>
-
 <body>
 	<div id="params">
 		Node Name: <input type="text" name="node-name" id="nodename"><br>
