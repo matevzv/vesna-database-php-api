@@ -13,8 +13,13 @@
 		return $id;
 	}
 
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+	function customError() {
+		$errorMessage =	"Sorry but this API only accepts a POST request with a specific JSON so ";
+		$errorMessage .= "the conclusion is that request method and/or JSON is incorrect!";
+		die ($errorMessage);
+	}
+
+	set_error_handler('customError');
 	
 	$requestMethod = $_SERVER['REQUEST_METHOD'];
 	if ($requestMethod != 'POST') {
