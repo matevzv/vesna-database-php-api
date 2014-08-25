@@ -1,4 +1,6 @@
-<?php	
+<?php
+	include 'sf-fwd';	
+		
 	function dbQueryReturnId($dbconn, $sql) {
 		$result = pg_query($dbconn, $sql);	
 		if (!$result) {
@@ -27,6 +29,7 @@
 	}
 	$input = file_get_contents("php://input");	
 	$json = json_decode($input);
+	forwardData($json);
 	$content = $json[0]->{'$content'};
 	$sensors = $content->sensors;	
 	if (empty($sensors)) {
