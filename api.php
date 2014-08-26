@@ -23,7 +23,7 @@
 		die ($errorMessage);
 	}
 
-	//set_error_handler('customError');
+	set_error_handler('customError');
 	
 	$requestMethod = $_SERVER['REQUEST_METHOD'];
 	if ($requestMethod != 'POST') {
