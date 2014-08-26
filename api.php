@@ -1,5 +1,7 @@
 <?php
-	include 'sf-fwd';	
+	include 'http-client.php';
+	
+	$fwdUrl="http://localhost/fwd.php";
 		
 	function dbQueryReturnId($dbconn, $sql) {
 		$result = pg_query($dbconn, $sql);	
@@ -21,22 +23,25 @@
 		die ($errorMessage);
 	}
 
-	set_error_handler('customError');
+	//set_error_handler('customError');
 	
 	$requestMethod = $_SERVER['REQUEST_METHOD'];
 	if ($requestMethod != 'POST') {
 		die("API only accepts POST method!");
 	}
-	$input = file_get_contents("php://input");	
+	$input = file_get_contents("php://input");
+	
+	//decoupling forwarding from storing data
+	sendPost($fwdUrl, $input);
+	
 	$json = json_decode($input);
-	forwardData($json);
 	$content = $json[0]->{'$content'};
 	$sensors = $content->sensors;	
 	if (empty($sensors)) {
 		die ("Measurements missing!");
 	}
 	
-	$dbconn = pg_connect("dbname=test user=matevz")	
+	$dbconn = pg_connect("host=localhost port=5433 dbname=test user=postgres")	
 		or die('Could not connect: ' . pg_last_error());
 	
 	$newNode = false;
