@@ -3,7 +3,8 @@
 	include 'template.php';
 	include 'http-client.php';
 	
-	$sfUrl = "http://localhost/test-post.php";
+	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
+	//$sfUrl = "http://localhost/test-post.php";
 	$staticId = "CITISENSE-JSI-";
 	
 	error_reporting(-1);
@@ -39,8 +40,28 @@
 		sendPostXml($sfUrl,$xml->asXML());
 	}
 	
-	function insertData() {
-		
+	function insertData($id, $measurements, $unit) {		
+		global $xmlDataTemplate;
+		global $sfUrl;
+		$xml = new SimpleXMLElement($xmlDataTemplate);
+		$ns=$xml->getNameSpaces(true);
+		$xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->attributes()->bn = $id;
+		$xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->attributes()->bt = time();
+			
+		foreach ($measurements as $measurement) {			
+			$ts = $measurement->timestamp;
+			$lat = $measurement->latitude;
+			$long = $measurement->longitude;
+			$value = $measurement->value;
+			
+			$child = $xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->addChild("e");
+			$child->addAttribute('sv', $value);
+			$child->addAttribute('t', $ts);
+			$child->addAttribute('u', $unit);
+			$child->addAttribute('lat', $lat);			
+			$child->addAttribute('lon', $long);
+		}
+		sendPostXml($sfUrl,$xml->asXML());
 	}
 
 	$requestMethod = $_SERVER['REQUEST_METHOD'];
@@ -60,7 +81,7 @@
 		or die('Could not connect: ' . pg_last_error());
 
 	$newNode = false;
-	$counter = 0;
+	$sensorCounter = 0;
 	foreach ($sensors as $sensor) {
 		$node_name = $sensor->sensor_node_id;
 		$sensor_name = $sensor->sensor_type;
@@ -68,9 +89,9 @@
 		$quantity_unit = $sensor->unit_of_measurement;
 		$context_description = $sensor->context;
 		
-		$sfSensorId = "$staticId$node_name$sensor_name$counter";
+		$sfSensorId = "$staticId$node_name$sensor_name$sensorCounter";
 		
-		if($counter == 0) {
+		if($sensorCounter == 0) {
 			$nodeIdQuery = "INSERT INTO nodes (node_name) ";
 			$nodeIdQuery .= "SELECT '$node_name' ";
 			$nodeIdQuery .= "WHERE NOT EXISTS (";
@@ -89,8 +110,8 @@
 			registerSensor($sfSensorId, $context_description, $quantity_name, $quantity_unit);
 		}
 		
-		// TODO insert data in WFS
+		insertData($sfSensorId, $sensor->measurements, $quantity_unit);
 		
-		$counter++;
+		$sensorCounter++;
 	}	
 ?>
