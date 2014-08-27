@@ -35,7 +35,7 @@
 		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->descriptiveword1 = $phenomenon;
 		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->descriptiveword2 = $unit;
 		
-		sendPostXml($sfUrl,$xml->asXML());
+		sendPostXml($sfUrl, $xml->asXML());
 	}
 	
 	function insertData($id, $measurements, $unit) {		
@@ -59,7 +59,7 @@
 			$child->addAttribute('lat', $lat);			
 			$child->addAttribute('lon', $long);
 		}
-		sendPostXml($sfUrl,$xml->asXML());
+		sendPostXml($sfUrl, $xml->asXML());
 	}
 
 	$requestMethod = $_SERVER['REQUEST_METHOD'];
