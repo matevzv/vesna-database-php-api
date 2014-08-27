@@ -1,10 +1,8 @@
 <?php
-	
 	include 'template.php';
 	include 'http-client.php';
 	
 	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
-	//$sfUrl = "http://localhost/test-post.php";
 	$staticId = "CITISENSE-JSI-";
 	
 	error_reporting(-1);
