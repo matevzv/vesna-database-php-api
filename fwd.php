@@ -5,8 +5,6 @@
 	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
 	$staticId = "CITISENSE-JSI-";
 	
-	error_reporting(-1);
-	
 	function dbQueryReturnId($dbconn, $sql) {
 		$result = pg_query($dbconn, $sql);	
 		if (!$result) {
