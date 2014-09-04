@@ -2,7 +2,8 @@
 	include 'template.php';
 	include 'http-client.php';
 	
-	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
+	//$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
+	$sfUrl = "http://localhost/test-post.php";
 	$staticId = "CITISENSE-JSI-";
 	
 	function dbQueryReturnId($dbconn, $sql) {
@@ -38,25 +39,36 @@
 	
 	function insertData($id, $measurements, $unit) {		
 		global $xmlDataTemplate;
+		global $jsiCityId;
 		global $sfUrl;
 		$xml = new SimpleXMLElement($xmlDataTemplate);
 		$ns=$xml->getNameSpaces(true);
-		$xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->attributes()->bn = $id;
-		$xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->attributes()->bt = time();
-			
-		foreach ($measurements as $measurement) {			
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->cityId->attributes($ns["xlink"])->href = $jsiCityId;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->sensorId->attributes($ns["xlink"])->href = $id;
+
+		$counter = 0;
+		foreach ($measurements as $measurement) {
 			$ts = $measurement->timestamp;
 			$lat = $measurement->latitude;
 			$long = $measurement->longitude;
 			$value = $measurement->value;
 			
-			$child = $xml->children($ns["wfs"])->Insert->children($ns["ns1"])->senml->addChild("e");
-			$child->addAttribute('sv', $value);
-			$child->addAttribute('t', $ts);
-			$child->addAttribute('u', $unit);
-			$child->addAttribute('lat', $lat);			
-			$child->addAttribute('lon', $long);
+			if($counter == 0) {
+				$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->starttime = gmdate("Y-m-d\TH:i:s", $ts);
+			}
+			
+			$content = $xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->contains->addChild("Measurement");
+			$content->addChild("idmeasurement", $counter);
+			$content->addChild("value", $value);
+			$content->addChild("uom", $unit);
+			$content->addChild("measuretime", gmdate("Y-m-d\TH:i:s", $ts));
+			$content->addChild("lat", $lat);
+			$content->addChild("lon", $long);
+			
+			$counter++;
 		}
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->finishtime = gmdate("Y-m-d\TH:i:s", $ts);
+		
 		sendPostXml($sfUrl, $xml->asXML());
 	}
 
