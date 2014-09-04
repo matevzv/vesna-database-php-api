@@ -2,8 +2,7 @@
 	include 'template.php';
 	include 'http-client.php';
 	
-	//$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
-	$sfUrl = "http://localhost/test-post.php";
+	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
 	$staticId = "CITISENSE-JSI-";
 	
 	function dbQueryReturnId($dbconn, $sql) {
