@@ -5,7 +5,7 @@
 		curl_setopt($ch, CURLOPT_URL,$url);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 1);
 		curl_exec($ch);
 		curl_close($ch);
 	}
