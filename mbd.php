@@ -82,7 +82,7 @@ if (!empty($sn_id) && strlen($sn_id) <= 5) {
 	} else if (pg_num_rows ($result) == 0) {
 		die ("Error: No measurements for the input!");
 	} else {		
-		//header("Content-Disposition: attachment; filename=\"$sn_id.csv\"");
+		header("Content-Disposition: attachment; filename=\"$sn_id.csv\"");
 		$firstLine = "node_name,sensor_name,quantity_name,unit_name,";
 		$firstLine .= "context_description,latitude,longitude,measurement_timestamp,";
 		$firstLine .= "measurement_value\r\n";
