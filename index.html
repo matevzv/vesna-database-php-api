@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="vesna sensor nodes measurements download system">
+	<meta name="keywords" content="VESNA,wireless,communication,sensor,measurements">
+	<meta name="author" content="Matevz Vucnik">
+	
+	<link rel="stylesheet" href="jquery-ui-themes-1.11.2/themes/smoothness/jquery-ui.min.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	
+	<script type="text/javascript">	
+	function requestCsvFile() {
+		var nodeName = document.getElementById('nodename').value || 0;
+		var startDate = document.getElementById('begindatepicker').value;
+		var endDate = document.getElementById('enddatepicker').value;
+		var limit = document.getElementById('limit').value || 10000;
+		var visitortime = new Date();
+		var visitortimezone = -visitortime.getTimezoneOffset()/60;
+		window.open("mbd.php?id="+nodeName+"&ts-begin="+startDate+"&ts-end="+endDate+"&limit="+limit+"&tz="+visitortimezone, "frame");
+	};
+	
+	$(function() {
+		$("#begindatepicker").datepicker({ dateFormat: 'yy-mm-dd' });
+	});
+	
+	$(function() {
+		$("#enddatepicker").datepicker({ dateFormat: 'yy-mm-dd' });
+	});
+	</script>
+</head>
+<body>
+	<div class="container">
+		<br>
+		<div class="jumbotron">
+			<h3>VESNA measurements download system</h3>			
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Node name</label>
+					<div class="col-sm-5">
+						<input type="text" class="form-control" id="nodename" placeholder="CS015">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Start date</label>
+					<div class="col-sm-5">
+						<input type="text" class="form-control" id="begindatepicker" placeholder="yy-mm-dd">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">End date</label>
+					<div class="col-sm-5">
+						<input type="text" class="form-control" id="enddatepicker" placeholder="yy-mm-dd">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Limit results</label>
+					<div class="col-sm-5">
+						<input type="text" class="form-control" id="limit" placeholder="10000 ( 0 means no limit! )">
+					</div>
+				</div>
+				<button class="btn btn-primary" type="button" onclick="requestCsvFile()">Submit</button>
+			</form>			
+			<div id="rs">
+				<br>
+				<iframe name="frame" frameBorder="0" style="height: 100%; width: 100%;"></iframe>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
