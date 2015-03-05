@@ -2,7 +2,7 @@
 	include 'template.php';
 	include 'http-client.php';
 	
-	$sfUrl = "http://citisense-wfst.elasticbeanstalk.com/GOPublisherWFS";
+	$sfUrl = "http://citisense-v2.elasticbeanstalk.com/citisense_v2_0_WFST/GOPublisherWFS";	
 	$staticId = "CITISENSE-JSI-";
 	
 	function dbQueryReturnId($dbconn, $sql) {
@@ -22,28 +22,26 @@
 	function registerSensor($sensorId, $context, $phenomenon, $unit) {
 		global $xmlRegTemplate;
 		global $jsiCityId;
-		global $sfUrl;
+		global $sfUrl;		
 		$xml = new SimpleXMLElement($xmlRegTemplate);
 		$ns=$xml->getNameSpaces(true);
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->sensorProviderId->attributes($ns["xlink"])->href = $jsiCityId;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->idsensor = $sensorId;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->name = $sensorId;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->description = $context;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->dateregistration = date('Y-m-d\TH:i:s');
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->descriptiveword1 = $phenomenon;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Sensors->descriptiveword2 = $unit;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->SensorDevice->sensorProviderID->attributes($ns["xlink"])->href = $jsiCityId;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->SensorDevice->identifier = $sensorId;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->SensorDevice->description = $context;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->SensorDevice->registrationDate = date('Y-m-d\TH:i:s');		
 		
 		sendPostXml($sfUrl, $xml->asXML());
 	}
 	
-	function insertData($id, $measurements, $unit) {		
+	function insertData($id, $measurements, $unit, $property) {		
 		global $xmlDataTemplate;
 		global $jsiCityId;
 		global $sfUrl;
+		global $pilotCityId;
 		$xml = new SimpleXMLElement($xmlDataTemplate);
 		$ns=$xml->getNameSpaces(true);
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->cityId->attributes($ns["xlink"])->href = $jsiCityId;
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->sensorId->attributes($ns["xlink"])->href = $id;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observation->cityID->attributes($ns["xlink"])->href = $pilotCityId;
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observation->sensorID->attributes($ns["xlink"])->href = $id;
 
 		$counter = 0;
 		foreach ($measurements as $measurement) {
@@ -53,20 +51,21 @@
 			$value = $measurement->value;
 			
 			if($counter == 0) {
-				$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->starttime = gmdate("Y-m-d\TH:i:s", $ts);
+				$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observation->starttime = gmdate("Y-m-d\TH:i:s", $ts);
 			}
 			
-			$content = $xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->contains->addChild("Measurement");
-			$content->addChild("idmeasurement", $counter);
+			$content = $xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observation->contains->addChild("Measurement");
+			$content->addChild("measurementID", $counter);
 			$content->addChild("value", $value);
 			$content->addChild("uom", $unit);
+			$content->addChild("observedProperty", $property);
 			$content->addChild("measuretime", gmdate("Y-m-d\TH:i:s", $ts));
-			$content->addChild("lat", $lat);
-			$content->addChild("lon", $long);
+			$content->addChild("latitude", $lat);
+			$content->addChild("longitude", $long);
 			
 			$counter++;
 		}
-		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observations->finishtime = gmdate("Y-m-d\TH:i:s", $ts);
+		$xml->children($ns["wfs"])->Insert->children($ns["cts"])->Observation->finishtime = gmdate("Y-m-d\TH:i:s", $ts);
 		
 		sendPostXml($sfUrl, $xml->asXML());
 	}
@@ -84,7 +83,7 @@
 		die ("Measurements missing!");
 	}
 
-	$dbconn = pg_connect("host=localhost port=5433 dbname=snowflake user=postgres")	
+	$dbconn = pg_connect("host=localhost port=5433 dbname=snowflake2 user=postgres")	
 		or die('Could not connect: ' . pg_last_error());
 
 	$newNode = false;
@@ -117,7 +116,7 @@
 			registerSensor($sfSensorId, $context_description, $quantity_name, $quantity_unit);
 		}
 		
-		insertData($sfSensorId, $sensor->measurements, $quantity_unit);
+		insertData($sfSensorId, $sensor->measurements, $quantity_unit, $quantity_name);
 		
 		$sensorCounter++;
 	}	
