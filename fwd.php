@@ -95,7 +95,12 @@
 		$quantity_unit = $sensor->unit_of_measurement;
 		$context_description = $sensor->context;
 		
-		$sfSensorId = "$staticId$node_name$sensor_name$sensorCounter";
+		if(isset($sensor->sensor_id)) {
+			$sensor_id = $sensor->sensor_id;
+			$sfSensorId = "$staticId$node_name$sensor_name$sensor_id";
+		} else {
+			$sfSensorId = "$staticId$node_name$sensor_name$sensorCounter";
+		}
 		
 		if($sensorCounter == 0) {
 			$nodeIdQuery = "INSERT INTO nodes (node_name) ";
