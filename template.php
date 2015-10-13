@@ -32,6 +32,7 @@ $xmlDataTemplate = <<<XML
             <cts:observationID>1</cts:observationID>
             <cts:starttime>2014-03-01T10:23:54.000</cts:starttime>
             <cts:finishtime>2014-02-12T10:24:54.000</cts:finishtime>
+						<cts:participantID>test_testID_JSI_1</cts:participantID>
         </cts:Observation>
     </wfs:Insert>
 </wfs:Transaction>
