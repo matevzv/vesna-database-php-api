@@ -10,10 +10,9 @@
 		curl_close($ch);
 	}
 
-	$username="";
-	$password="";
-
 	function sendPostXml($url,$data) {
+		$username="";
+		$password="";
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,$url);
 		curl_setopt($ch, CURLOPT_POST, 1);
